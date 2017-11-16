@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Baking Companion</string>
+
+    <string name="drawer_open">Open Navigation</string>
+    <string name="drawer_close">Close Navigation</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="previous_step">Previous Step</string>
+    <string name="next_step">Next Step</string>
+    <string name="next_recipe">Next Recipe</string>
+    <string name="recipe_overview_image">Recipe OverView Image</string>
+</resources>
