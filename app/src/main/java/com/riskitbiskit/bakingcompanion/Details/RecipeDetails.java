@@ -37,7 +37,6 @@ public class RecipeDetails extends AppCompatActivity implements RecipeStepsFragm
     private boolean twoPanel;
     private List<String> recipeNames;
     private ArrayAdapter<String> arrayAdapter;
-    private String mActivityTitle;
     private ActionBarDrawerToggle mDrawerToggle;
 
     //Views
@@ -59,81 +58,30 @@ public class RecipeDetails extends AppCompatActivity implements RecipeStepsFragm
         //get data passed in from intent
         Intent intent = getIntent();
         recipeNames = intent.getStringArrayListExtra(MainActivity.RECIPE_LIST);
-        mActivityTitle = getTitle().toString();
+        recipeNumber = intent.getIntExtra(MainActivity.RECIPE_INDEX_NUMBER, 0);
 
         //setup menu
         setupMenu();
 
+        //grab recipe saved in SIS if there is one
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(RECIPE_SAVED_STATE)) {
                 recipeNumber = savedInstanceState.getInt(RECIPE_SAVED_STATE);
             }
         }
 
+        //determine if user is viewing from a tablet(two panel) or phone(single panel)
         if (findViewById(R.id.two_panel_layout) != null) {
             twoPanel = true;
-
-            recipeNumber = intent.getIntExtra(MainActivity.RECIPE_INDEX_NUMBER, 0);
-
-            if (savedInstanceState == null) {
-                //Set-up recipe steps fragment
-                RecipeStepsFragment recipeStepsFragment = new RecipeStepsFragment();
-
-                FragmentManager fragmentManager = getSupportFragmentManager();
-
-                fragmentManager.beginTransaction()
-                        .add(R.id.recipe_steps_container, recipeStepsFragment)
-                        .commit();
-
-                //Set-up Step Details Fragment
-                StepDetailsFragment stepDetailsFragment = new StepDetailsFragment();
-
-                fragmentManager.beginTransaction()
-                        .add(R.id.step_details_frag_container, stepDetailsFragment)
-                        .commit();
-            }
+            setupTwoPanel(savedInstanceState);
         } else {
             twoPanel = false;
-
-            if (savedInstanceState == null) {
-
-                recipeNumber = intent.getIntExtra(MainActivity.RECIPE_INDEX_NUMBER, 0);
-
-                RecipeStepsFragment recipeStepsFragment = new RecipeStepsFragment();
-
-                FragmentManager fragmentManager = getSupportFragmentManager();
-
-                fragmentManager.beginTransaction()
-                        .add(R.id.recipe_steps_container, recipeStepsFragment)
-                        .commit();
-            }
+            setupSinglePanel(savedInstanceState);
         }
     }
 
-    @Override
-    public void onRecipeClicked(int position) {
-        if (twoPanel) {
-            StepDetailsFragment newFragment = new StepDetailsFragment();
-            newFragment.setRecipeNumber(recipeNumber);
-            newFragment.setRequestedStep(position);
-            newFragment.setIsTwoPanel(true);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.step_details_frag_container, newFragment)
-                    .commit();
-
-        } else {
-            Intent intent = new Intent(this, StepDetails.class);
-            intent.putExtra(INSTRUCTION_STEP, position);
-            intent.putExtra(MainActivity.RECIPE_INDEX_NUMBER, recipeNumber);
-            startActivity(intent);
-        }
-    }
-
-    //Setup Hamburger Menu
+    //setup hamburger menu
     private void setupMenu() {
-        //Refactored code from: https://developer.android.com/training/implementing-navigation/nav-drawer.html
-        //and http://blog.teamtreehouse.com/add-navigation-drawer-android
-
         arrayAdapter = new ArrayAdapter<>(getBaseContext(), android.R.layout.simple_list_item_1, recipeNames);
         mDrawerList.setAdapter(arrayAdapter);
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -147,7 +95,7 @@ public class RecipeDetails extends AppCompatActivity implements RecipeStepsFragm
             }
         });
 
-        //Setup Hamburger Image
+        //setup hamburger image
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
             @Override
             public void onDrawerOpened(View drawerView) {
@@ -159,11 +107,62 @@ public class RecipeDetails extends AppCompatActivity implements RecipeStepsFragm
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                getSupportActionBar().setTitle(mActivityTitle);
+                getSupportActionBar().setTitle(getTitle().toString());
             }
         };
 
         mDrawerToggle.setDrawerIndicatorEnabled(true);
+    }
+
+    private void setupTwoPanel(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            //setup recipe steps fragment
+            RecipeStepsFragment recipeStepsFragment = new RecipeStepsFragment();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .add(R.id.recipe_steps_container, recipeStepsFragment)
+                    .commit();
+
+            //setup step details fragment
+            StepDetailsFragment stepDetailsFragment = new StepDetailsFragment();
+            fragmentManager.beginTransaction()
+                    .add(R.id.step_details_frag_container, stepDetailsFragment)
+                    .commit();
+        }
+    }
+
+    private void setupSinglePanel(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            //setup recipe steps fragment
+            RecipeStepsFragment recipeStepsFragment = new RecipeStepsFragment();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .add(R.id.recipe_steps_container, recipeStepsFragment)
+                    .commit();
+        }
+    }
+
+
+    @Override
+    public void onRecipeClicked(int position) {
+        if (twoPanel) {
+            //create new step details fragment
+            StepDetailsFragment newFragment = new StepDetailsFragment();
+            newFragment.setRecipeNumber(recipeNumber);
+            newFragment.setRequestedStep(position);
+            newFragment.setIsTwoPanel(true);
+
+            //replace old fragment with newly created fragment
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.step_details_frag_container, newFragment)
+                    .commit();
+
+        } else {
+            Intent intent = new Intent(this, StepDetails.class);
+            intent.putExtra(INSTRUCTION_STEP, position);
+            intent.putExtra(MainActivity.RECIPE_INDEX_NUMBER, recipeNumber);
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -177,7 +176,6 @@ public class RecipeDetails extends AppCompatActivity implements RecipeStepsFragm
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
