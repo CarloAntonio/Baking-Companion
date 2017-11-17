@@ -54,7 +54,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class StepDetailsFragment extends Fragment implements ExoPlayer.EventListener{
+public class StepDetailsFragment extends Fragment {
 
     //Constants
     public static final String VOLLEY_TAG = "volley_tag";
@@ -191,6 +191,7 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
 
         mRequestQueue.add(jsonArrayRequest);
     }
+
     private void parseJsonData(JSONArray response) throws JSONException {
         //get reference to root node
         JSONObject currentRecipe = response.getJSONObject(recipeNumber);
@@ -223,7 +224,7 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
             mSimpleExoPlayerView.setPlayer(mExoPlayer);
 
             // Set the ExoPlayer.EventListener to this activity.
-            mExoPlayer.addListener(this);
+            mExoPlayer.addListener(new ExoPlayerListener());
 
             // Prepare the MediaSource.
             String userAgent = Util.getUserAgent(getContext(), "StrangeBakerThings");
@@ -377,37 +378,6 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
     private void setupInstructions() {
         //set up instructions
         mStepTV.setText(mInstructions.get(requestedStep).getInstruction());
-    }
-
-    //TODO: refactor - move exoplayer listener to a new class
-    @Override
-    public void onTimelineChanged(Timeline timeline, Object manifest) {
-
-    }
-
-    @Override
-    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-
-    }
-
-    @Override
-    public void onLoadingChanged(boolean isLoading) {
-
-    }
-
-    @Override
-    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-
-    }
-
-    @Override
-    public void onPlayerError(ExoPlaybackException error) {
-
-    }
-
-    @Override
-    public void onPositionDiscontinuity() {
-
     }
 
     @Override
