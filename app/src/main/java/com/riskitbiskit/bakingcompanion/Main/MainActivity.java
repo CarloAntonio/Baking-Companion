@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
     private RecipeRVAdapter rvAdpter;
     private ArrayAdapter<String> arrayAdapter;
     private ActionBarDrawerToggle mDrawerToggle;
-    private String mActivityTitle;
     GridLayoutManager gridLayoutManager;
     RequestQueue mRequestQueue;
     List<Recipe> recipes;
@@ -82,9 +81,20 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
         //initialize variables
         recipes = new ArrayList<>();
         recipeNames = new ArrayList<>();
-        mActivityTitle = getTitle().toString();
 
         //TODO: refactor - replace with retrofit2
+        makeNetworkRequest();
+
+        //use of recyclerview is a design requirement from Udacity, would have used a gridview
+        createColumnNum();
+
+        //set up recycler view
+        recipeListRV.setLayoutManager(gridLayoutManager);
+        rvAdpter = new RecipeRVAdapter(this, recipes, this);
+        recipeListRV.setAdapter(rvAdpter);
+    }
+
+    private void makeNetworkRequest() {
         //Used developer.android.com/training/volley to learn and implement this code
         mRequestQueue = Volley.newRequestQueue(this);
 
@@ -102,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
                 //Refactored code from: https://developer.android.com/training/implementing-navigation/nav-drawer.html
                 //and http://blog.teamtreehouse.com/add-navigation-drawer-android
                 setupMenu();
-
             }
         }, new Response.ErrorListener() {
             @Override
@@ -112,26 +121,6 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
         });
 
         mRequestQueue.add(jsonArrayRequest);
-
-        //Source: https://stackoverflow.com/questions/6465680/how-to-determine-the-screen-width-in-terms-of-dp-or-dip-at-runtime-in-android
-        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
-        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-
-        if (dpWidth < 600) {
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                gridLayoutManager = new GridLayoutManager(this, 1);
-            } else {
-                gridLayoutManager = new GridLayoutManager(this, 2);
-            }
-        } else {
-            gridLayoutManager = new GridLayoutManager(this, 3);
-        }
-
-        recipeListRV.setLayoutManager(gridLayoutManager);
-
-        rvAdpter = new RecipeRVAdapter(this, recipes, this);
-
-        recipeListRV.setAdapter(rvAdpter);
     }
 
     private void parseJsonResponse(JSONArray response) {
@@ -149,9 +138,8 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
         }
     }
 
+    //setup hamburger menu
     private void setupMenu() {
-
-        //Setup Hamburger Menu
         arrayAdapter = new ArrayAdapter<>(getBaseContext(), android.R.layout.simple_list_item_1, recipeNames);
 
         mDrawerList.setAdapter(arrayAdapter);
@@ -165,7 +153,8 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
             }
         });
 
-        //Setup Hamburger Image
+        //TODO: check this code with lumpia app, seems off
+        //setup hamburger image
         mDrawerToggle = new ActionBarDrawerToggle(MainActivity.this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
             @Override
             public void onDrawerOpened(View drawerView) {
@@ -177,13 +166,29 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                getSupportActionBar().setTitle(mActivityTitle);
+                getSupportActionBar().setTitle(getTitle().toString());
             }
         };
 
         mDrawerToggle.setDrawerIndicatorEnabled(true);
 
         mDrawerToggle.syncState();
+    }
+
+    private void createColumnNum() {
+        //Source: https://stackoverflow.com/questions/6465680/how-to-determine-the-screen-width-in-terms-of-dp-or-dip-at-runtime-in-android
+        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+
+        if (dpWidth < 600) {
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                gridLayoutManager = new GridLayoutManager(this, 1);
+            } else {
+                gridLayoutManager = new GridLayoutManager(this, 2);
+            }
+        } else {
+            gridLayoutManager = new GridLayoutManager(this, 3);
+        }
     }
 
     @Override
