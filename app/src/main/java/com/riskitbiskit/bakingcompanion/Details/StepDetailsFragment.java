@@ -117,25 +117,13 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
         //check to see if device should display two panel or single panel
         if (isTwoPanel) {
             if (savedInstanceState != null) {
-                requestedStep = savedInstanceState.getInt(LIST_INDEX);
-                mInstructions = savedInstanceState.getParcelableArrayList(INSTRUCTIONS_LIST);
-                playerPosition = savedInstanceState.getLong(PLAYER_POSITION);
-
-                setupInstructions();
-                setupExoPlayer();
-                addOrRemoveButtons();
+                reuseSavedData(savedInstanceState);
             } else {
                 makeVolleyRequest();
             }
         } else {
             if (savedInstanceState != null) {
-                requestedStep = savedInstanceState.getInt(LIST_INDEX);
-                mInstructions = savedInstanceState.getParcelableArrayList(INSTRUCTIONS_LIST);
-                playerPosition = savedInstanceState.getLong(PLAYER_POSITION);
-
-                setupInstructions();
-                setupExoPlayer();
-                addOrRemoveButtons();
+                reuseSavedData(savedInstanceState);
             } else {
                 recipeNumber = intent.getIntExtra(MainActivity.RECIPE_INDEX_NUMBER, 0);
                 requestedStep = intent.getIntExtra(RecipeDetails.INSTRUCTION_STEP, 0);
@@ -171,6 +159,18 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
         });
 
         return rootView;
+    }
+
+    private void reuseSavedData(Bundle savedInstanceState) {
+        //retrieved saved data
+        requestedStep = savedInstanceState.getInt(LIST_INDEX);
+        mInstructions = savedInstanceState.getParcelableArrayList(INSTRUCTIONS_LIST);
+        playerPosition = savedInstanceState.getLong(PLAYER_POSITION);
+
+        //setup views
+        setupInstructions();
+        setupExoPlayer();
+        addOrRemoveButtons();
     }
 
     private void makeVolleyRequest() {
