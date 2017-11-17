@@ -183,9 +183,9 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
             }
         } else {
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                gridLayoutManager = new GridLayoutManager(this, 2);
+                gridLayoutManager = new GridLayoutManager(this, 1);
             } else {
-                gridLayoutManager = new GridLayoutManager(this, 3);
+                gridLayoutManager = new GridLayoutManager(this, 2);
             }
         }
 

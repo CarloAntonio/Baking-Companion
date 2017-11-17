@@ -5,20 +5,22 @@
     tools:context="com.riskitbiskit.bakingcompanion.Main.MainActivity"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark">
 
     <!-- The main content view -->
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:layout_margin="32dp">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recipe_list_rv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"/>
 
     </FrameLayout>
 
