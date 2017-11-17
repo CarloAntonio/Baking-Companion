@@ -9,4 +9,5 @@
     <string name="next_step">Next Step</string>
     <string name="next_recipe">Next Recipe</string>
     <string name="recipe_overview_image">Recipe OverView Image</string>
+    <string name="thumbnail_of_recipe_step">thumbnail of recipe step</string>
 </resources>
