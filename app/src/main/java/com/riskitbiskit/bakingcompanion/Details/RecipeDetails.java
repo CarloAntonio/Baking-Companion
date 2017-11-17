@@ -25,22 +25,24 @@ import butterknife.ButterKnife;
 
 public class RecipeDetails extends AppCompatActivity implements RecipeStepsFragment.OnRecipeClickListener{
 
+    //Testing
     public static final String LOG_TAG = RecipeDetails.class.getSimpleName();
 
+    //Constants
     public static final String INSTRUCTION_STEP = "instructionsStep";
     public static final String RECIPE_SAVED_STATE = "recipeSavedState";
 
+    //Fields
     private int recipeNumber;
     private boolean twoPanel;
-
     private List<String> recipeNames;
     private ArrayAdapter<String> arrayAdapter;
     private String mActivityTitle;
     private ActionBarDrawerToggle mDrawerToggle;
 
+    //Views
     @BindView(R.id.drawer_layout_steps)
     DrawerLayout mDrawerLayout;
-
     @BindView(R.id.left_drawer_steps)
     ListView mDrawerList;
 
@@ -50,20 +52,17 @@ public class RecipeDetails extends AppCompatActivity implements RecipeStepsFragm
         setContentView(R.layout.activity_recipe_details);
         ButterKnife.bind(this);
 
+        //setup action bar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
+        //get data passed in from intent
         Intent intent = getIntent();
         recipeNames = intent.getStringArrayListExtra(MainActivity.RECIPE_LIST);
         mActivityTitle = getTitle().toString();
 
-        //Sets up hamburger menu
-        //Refactored code from: https://developer.android.com/training/implementing-navigation/nav-drawer.html
-        //and http://blog.teamtreehouse.com/add-navigation-drawer-android
-        setupMenuItems();
+        //setup menu
         setupMenu();
-
-        mDrawerToggle.setDrawerIndicatorEnabled(true);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(RECIPE_SAVED_STATE)) {
@@ -130,8 +129,11 @@ public class RecipeDetails extends AppCompatActivity implements RecipeStepsFragm
         }
     }
 
-    private void setupMenuItems() {
-        //Setup Hamburger Menu
+    //Setup Hamburger Menu
+    private void setupMenu() {
+        //Refactored code from: https://developer.android.com/training/implementing-navigation/nav-drawer.html
+        //and http://blog.teamtreehouse.com/add-navigation-drawer-android
+
         arrayAdapter = new ArrayAdapter<>(getBaseContext(), android.R.layout.simple_list_item_1, recipeNames);
         mDrawerList.setAdapter(arrayAdapter);
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -144,9 +146,7 @@ public class RecipeDetails extends AppCompatActivity implements RecipeStepsFragm
                 finish();
             }
         });
-    }
 
-    private void setupMenu() {
         //Setup Hamburger Image
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
             @Override
@@ -162,6 +162,8 @@ public class RecipeDetails extends AppCompatActivity implements RecipeStepsFragm
                 getSupportActionBar().setTitle(mActivityTitle);
             }
         };
+
+        mDrawerToggle.setDrawerIndicatorEnabled(true);
     }
 
     @Override

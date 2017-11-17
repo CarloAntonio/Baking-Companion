@@ -101,6 +101,8 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
                 //parse through json response
                 parseJsonResponse(response);
 
+                rvAdpter.notifyDataSetChanged();
+
                 //setup hamburger menu
                 //Refactored code from: https://developer.android.com/training/implementing-navigation/nav-drawer.html
                 //and http://blog.teamtreehouse.com/add-navigation-drawer-android
