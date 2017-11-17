@@ -23,7 +23,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RecipeDetails extends AppCompatActivity implements RecipeStepsFragment.OnRecipeClickListener{
+public class RecipeDetails extends AppCompatActivity implements RecipeFragment.OnRecipeClickListener{
 
     //Testing
     public static final String LOG_TAG = RecipeDetails.class.getSimpleName();
@@ -117,10 +117,10 @@ public class RecipeDetails extends AppCompatActivity implements RecipeStepsFragm
     private void setupTwoPanel(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             //setup recipe steps fragment
-            RecipeStepsFragment recipeStepsFragment = new RecipeStepsFragment();
+            RecipeFragment recipeFragment = new RecipeFragment();
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
-                    .add(R.id.recipe_steps_container, recipeStepsFragment)
+                    .add(R.id.recipe_steps_container, recipeFragment)
                     .commit();
 
             //setup step details fragment
@@ -134,10 +134,10 @@ public class RecipeDetails extends AppCompatActivity implements RecipeStepsFragm
     private void setupSinglePanel(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             //setup recipe steps fragment
-            RecipeStepsFragment recipeStepsFragment = new RecipeStepsFragment();
+            RecipeFragment recipeFragment = new RecipeFragment();
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
-                    .add(R.id.recipe_steps_container, recipeStepsFragment)
+                    .add(R.id.recipe_steps_container, recipeFragment)
                     .commit();
         }
     }
