@@ -12,8 +12,7 @@
         android:contentDescription="@string/recipe_overview_image"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:scaleType="centerCrop"
-        app:srcCompat="@mipmap/ic_launcher"/>
+        android:scaleType="centerCrop"/>
 
     <TextView
         android:id="@+id/recipe_name_cover"

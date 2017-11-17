@@ -6,13 +6,13 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark">
+    android:background="@android:color/white">
 
     <!-- The main content view -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white"
+        android:background="@color/colorPrimaryDark"
         android:layout_margin="32dp">
 
         <android.support.v7.widget.RecyclerView
