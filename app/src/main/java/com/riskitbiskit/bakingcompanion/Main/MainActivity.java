@@ -18,7 +18,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -68,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
     @BindView(R.id.left_drawer)
     ListView mDrawerList;
 
+    //TODO: feat - create on save instance state to prevent unnecessary calls to the network
+    //TODO: feat - add a content provider so that we only need to make a network call during main activity
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,19 +84,14 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
         recipes = new ArrayList<>();
         recipeNames = new ArrayList<>();
 
-        //TODO: refactor - replace with retrofit2
         makeNetworkRequest();
 
         //use of recyclerview is a design requirement from Udacity, would have used a gridview
-        createColumnNum();
-
-        //set up recycler view
-        recipeListRV.setLayoutManager(gridLayoutManager);
-        rvAdpter = new RecipeRVAdapter(this, recipes, this);
-        recipeListRV.setAdapter(rvAdpter);
+        setupRecyclerView();
     }
 
     private void makeNetworkRequest() {
+        //TODO: refactor - replace with retrofit2
         //Used developer.android.com/training/volley to learn and implement this code
         mRequestQueue = Volley.newRequestQueue(this);
 
@@ -103,10 +100,6 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
             public void onResponse(JSONArray response) {
                 //parse through json response
                 parseJsonResponse(response);
-
-                //let adapter know that change data needs to be refreshed
-                //TODO: remove - data only gets set once, no need to notify adapter
-                rvAdpter.notifyDataSetChanged();
 
                 //setup hamburger menu
                 //Refactored code from: https://developer.android.com/training/implementing-navigation/nav-drawer.html
@@ -175,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
         mDrawerToggle.syncState();
     }
 
-    private void createColumnNum() {
+    private void setupRecyclerView() {
         //Source: https://stackoverflow.com/questions/6465680/how-to-determine-the-screen-width-in-terms-of-dp-or-dip-at-runtime-in-android
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
@@ -189,6 +182,10 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
         } else {
             gridLayoutManager = new GridLayoutManager(this, 3);
         }
+
+        recipeListRV.setLayoutManager(gridLayoutManager);
+        rvAdpter = new RecipeRVAdapter(this, recipes, this);
+        recipeListRV.setAdapter(rvAdpter);
     }
 
     @Override
