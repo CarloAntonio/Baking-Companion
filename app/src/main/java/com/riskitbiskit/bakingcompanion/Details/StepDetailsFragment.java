@@ -296,7 +296,6 @@ public class StepDetailsFragment extends Fragment {
                 mSimpleExoPlayerView.setVisibility(View.INVISIBLE);
                 //set the thumbnail to
                 imageViewThumbnail(mInstructions.get(requestedStep).getThumbnailUrl());
-
             }
 
         //if there is no thumbnail or video, show default image
@@ -393,8 +392,10 @@ public class StepDetailsFragment extends Fragment {
         outState.putParcelableArrayList(INSTRUCTIONS_LIST, (ArrayList<Instructions>) mInstructions);
         outState.putInt(LIST_INDEX, requestedStep);
 
-        playerPosition = mExoPlayer.getCurrentPosition();
-        outState.putLong(PLAYER_POSITION, playerPosition);
+        if (mExoPlayer != null) {
+            playerPosition = mExoPlayer.getCurrentPosition();
+            outState.putLong(PLAYER_POSITION, playerPosition);
+        }
     }
 
     @Override
