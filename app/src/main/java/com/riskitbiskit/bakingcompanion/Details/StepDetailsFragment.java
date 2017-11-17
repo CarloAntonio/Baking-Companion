@@ -138,10 +138,7 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
                 releasePlayer();
                 //increment to the next step
                 requestedStep++;
-                addOrRemoveButtons();
-                setupInstructions();
-                setupExoPlayer();
-
+                fullSetup();
             }
         });
 
@@ -152,9 +149,7 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
                 releasePlayer();
                 //increment to the next step
                 requestedStep--;
-                addOrRemoveButtons();
-                setupInstructions();
-                setupExoPlayer();
+                fullSetup();
             }
         });
 
@@ -168,9 +163,7 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
         playerPosition = savedInstanceState.getLong(PLAYER_POSITION);
 
         //setup views
-        setupInstructions();
-        setupExoPlayer();
-        addOrRemoveButtons();
+        fullSetup();
     }
 
     private void makeVolleyRequest() {
@@ -180,28 +173,8 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
             @Override
             public void onResponse(JSONArray response) {
                 try {
-                    JSONObject currentRecipe = response.getJSONObject(recipeNumber);
-
-                    //Grab requested instruction
-                    JSONArray requestedInstructions = currentRecipe.getJSONArray("steps");
-
-                    for (int i = 0; i < requestedInstructions.length(); i++) {
-                        JSONObject currentStep = requestedInstructions.getJSONObject(i);
-                        int id = currentStep.getInt("id");
-                        String shortDescription = currentStep.getString("shortDescription");
-                        String description = currentStep.getString("description");
-                        String videoUrl = currentStep.getString("videoURL");
-                        String thumbnail = currentStep.getString("thumbnailURL");
-
-                        mInstructions.add(new Instructions(id, shortDescription, description, videoUrl, thumbnail));
-                    }
-
-                    //set up instructions
-                    mStepTV.setText(mInstructions.get(requestedStep).getInstruction());
-
-                    setupExoPlayer();
-
-                    addOrRemoveButtons();
+                    parseJsonData(response);
+                    fullSetup();
 
                 } catch (JSONException JSONE) {
                     JSONE.printStackTrace();
@@ -217,6 +190,27 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
         jsonArrayRequest.setTag(VOLLEY_TAG);
 
         mRequestQueue.add(jsonArrayRequest);
+    }
+    private void parseJsonData(JSONArray response) throws JSONException {
+        //get reference to root node
+        JSONObject currentRecipe = response.getJSONObject(recipeNumber);
+
+        //grab requested instruction
+        JSONArray requestedInstructions = currentRecipe.getJSONArray("steps");
+
+        //cycle through each step
+        for (int i = 0; i < requestedInstructions.length(); i++) {
+            //extract relevant data from each step
+            JSONObject currentStep = requestedInstructions.getJSONObject(i);
+            int id = currentStep.getInt("id");
+            String shortDescription = currentStep.getString("shortDescription");
+            String description = currentStep.getString("description");
+            String videoUrl = currentStep.getString("videoURL");
+            String thumbnail = currentStep.getString("thumbnailURL");
+
+            //add to list of instructions
+            mInstructions.add(new Instructions(id, shortDescription, description, videoUrl, thumbnail));
+        }
     }
 
     //Refactored from Media Playback Lesson (Advance Android), initializes ExoPlayer
@@ -252,6 +246,12 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
             mExoPlayer.release();
             mExoPlayer = null;
         }
+    }
+
+    private void fullSetup() {
+        addOrRemoveButtons();
+        setupExoPlayer();
+        setupInstructions();
     }
 
     //method for setting up add or remove buttons depending on step
@@ -413,7 +413,6 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
     @Override
     public void onResume() {
         super.onResume();
-
         if(mInstructions.size() != 0) {
             initializePlayer(Uri.parse(mInstructions.get(requestedStep).getVideoUrl()));
         }
@@ -435,14 +434,12 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
         if (mRequestQueue != null) {
             mRequestQueue.cancelAll(VOLLEY_TAG);
         }
-
         releasePlayer();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-
         //clean up playerPosition
         playerPosition = 0L;
     }
