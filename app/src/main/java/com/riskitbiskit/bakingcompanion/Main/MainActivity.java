@@ -42,42 +42,32 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.ListItemClicked {
 
+    //Testing
     public static final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    //Constants
     public static final String RECIPE_INDEX_NUMBER = "recipeNumber";
     public static final String RECIPE_LIST = "recipeList";
     public static final String DATA_URL = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
 
-    RequestQueue mRequestQueue;
-    List<Recipe> recipes;
-    SimpleIdlingResource mIdlingResource;
-
-    //Menu Variables
+    //Fields
     private List<String> recipeNames;
     private RecipeRVAdapter rvAdpter;
     private ArrayAdapter<String> arrayAdapter;
     private ActionBarDrawerToggle mDrawerToggle;
     private String mActivityTitle;
     GridLayoutManager gridLayoutManager;
+    RequestQueue mRequestQueue;
+    List<Recipe> recipes;
+    SimpleIdlingResource mIdlingResource;
 
-
+    //Views
     @BindView(R.id.recipe_list_rv)
     RecyclerView recipeListRV;
-
     @BindView(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
-
     @BindView(R.id.left_drawer)
     ListView mDrawerList;
-
-    @VisibleForTesting
-    @NonNull
-    public IdlingResource getIdlingResource() {
-        if (mIdlingResource == null) {
-            mIdlingResource = new SimpleIdlingResource();
-        }
-        return mIdlingResource;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,41 +79,32 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
         recipeNames = new ArrayList<>();
         mActivityTitle = getTitle().toString();
 
-
+        //TODO: refactor - replace with retrofit2
         //Used developer.android.com/training/volley to learn and implement this code
         mRequestQueue = Volley.newRequestQueue(this);
 
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, DATA_URL, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-                try {
-                    for (int i = 0; i < response.length(); i++) {
-                        JSONObject currentRecipe = response.getJSONObject(i);
-                        int recipeId = currentRecipe.getInt("id");
-                        String recipeName = currentRecipe.getString("name");
-                        String recipeImage = currentRecipe.getString("image");
-                        recipes.add(new Recipe(recipeId, recipeName, recipeImage));
-                        recipeNames.add(recipeName);
-                    }
+                //parse through json response
+                parseJsonResponse(response);
 
-                    rvAdpter.notifyDataSetChanged();
+                //let adapter know that change data needs to be refreshed
+                //TODO: remove - data only gets set once, no need to notify adapter
+                rvAdpter.notifyDataSetChanged();
 
-                    //Sets up hamburger menu
-                    //Refactored code from: https://developer.android.com/training/implementing-navigation/nav-drawer.html
-                    //and http://blog.teamtreehouse.com/add-navigation-drawer-android
-                    setupMenuItems();
-                    setupMenu();
+                //Sets up hamburger menu
+                //Refactored code from: https://developer.android.com/training/implementing-navigation/nav-drawer.html
+                //and http://blog.teamtreehouse.com/add-navigation-drawer-android
+                setupMenuItems();
+                setupMenu();
 
-                    mDrawerToggle.setDrawerIndicatorEnabled(true);
+                mDrawerToggle.setDrawerIndicatorEnabled(true);
 
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                    getSupportActionBar().setHomeButtonEnabled(true);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setHomeButtonEnabled(true);
 
-                    mDrawerToggle.syncState();
-
-                } catch (JSONException JSONE) {
-                    JSONE.printStackTrace();
-                }
+                mDrawerToggle.syncState();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -155,6 +136,21 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
         rvAdpter = new RecipeRVAdapter(this, recipes, this);
 
         recipeListRV.setAdapter(rvAdpter);
+    }
+
+    private void parseJsonResponse(JSONArray response) {
+        try {
+            for (int i = 0; i < response.length(); i++) {
+                JSONObject currentRecipe = response.getJSONObject(i);
+                int recipeId = currentRecipe.getInt("id");
+                String recipeName = currentRecipe.getString("name");
+                String recipeImage = currentRecipe.getString("image");
+                recipes.add(new Recipe(recipeId, recipeName, recipeImage));
+                recipeNames.add(recipeName);
+            }
+        } catch (JSONException JSONE) {
+            JSONE.printStackTrace();
+        }
     }
 
     private void setupMenuItems() {
@@ -201,7 +197,6 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -211,5 +206,15 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
         intent.putExtra(RECIPE_INDEX_NUMBER, clickedItemIndex);
         intent.putStringArrayListExtra(RECIPE_LIST, (ArrayList<String>) recipeNames);
         startActivity(intent);
+    }
+
+    //idling resource for UI testing
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (mIdlingResource == null) {
+            mIdlingResource = new SimpleIdlingResource();
+        }
+        return mIdlingResource;
     }
 }
