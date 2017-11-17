@@ -53,6 +53,9 @@ public class RecipeRVAdapter extends RecyclerView.Adapter<RecipeRVAdapter.Recipe
             if (holder.mRecipeIV != null) {
                 holder.mRecipeIV.setVisibility(View.VISIBLE);
             }
+            if (holder.mRecipeNameCoverTV != null) {
+                holder.mRecipeNameCoverTV.setVisibility(View.VISIBLE);
+            }
             if (holder.mRecipeNameTV != null) {
                 holder.mRecipeNameTV.setVisibility(View.INVISIBLE);
             }
@@ -61,6 +64,9 @@ public class RecipeRVAdapter extends RecyclerView.Adapter<RecipeRVAdapter.Recipe
             //use image in data drawable instead
             if (holder.mRecipeIV != null) {
                 holder.mRecipeIV.setVisibility(View.VISIBLE);
+            }
+            if (holder.mRecipeNameCoverTV != null) {
+                holder.mRecipeNameCoverTV.setVisibility(View.VISIBLE);
             }
             if (holder.mRecipeNameTV != null) {
                 holder.mRecipeNameTV.setVisibility(View.INVISIBLE);
@@ -72,12 +78,16 @@ public class RecipeRVAdapter extends RecyclerView.Adapter<RecipeRVAdapter.Recipe
             //find correct drawable image
             if (recipeName.contentEquals("Nutella Pie")) {
                 Glide.with(mContext).load(R.drawable.pie).into(holder.mRecipeIV);
+                holder.mRecipeNameCoverTV.setText(currentRecipe.getName());
             } else if (recipeName.contentEquals("Brownies")) {
                 Glide.with(mContext).load(R.drawable.brownies).into(holder.mRecipeIV);
+                holder.mRecipeNameCoverTV.setText(currentRecipe.getName());
             } else if (recipeName.contentEquals("Yellow Cake")) {
                 Glide.with(mContext).load(R.drawable.cake).into(holder.mRecipeIV);
+                holder.mRecipeNameCoverTV.setText(currentRecipe.getName());
             } else if (recipeName.contentEquals("Cheesecake")) {
                 Glide.with(mContext).load(R.drawable.cheesecake).into(holder.mRecipeIV);
+                holder.mRecipeNameCoverTV.setText(currentRecipe.getName());
             } else {
                 //Original code, specified by guideline, but UI looks unappealing
                 if (holder.mRecipeIV != null) {
@@ -103,6 +113,8 @@ public class RecipeRVAdapter extends RecyclerView.Adapter<RecipeRVAdapter.Recipe
         ImageView mRecipeIV;
         @BindView(R.id.recipe_name_TV)
         TextView mRecipeNameTV;
+        @BindView(R.id.recipe_name_cover)
+        TextView mRecipeNameCoverTV;
 
         public RecipeViewHolder(View itemView) {
             super(itemView);
