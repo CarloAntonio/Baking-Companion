@@ -145,7 +145,7 @@ public class StepDetailsFragment extends Fragment {
         mPreviousBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //clear exoPlayer of current data
+                //clear exoplayer of current data
                 releasePlayer();
                 //increment to the next step
                 requestedStep--;
@@ -214,7 +214,6 @@ public class StepDetailsFragment extends Fragment {
         }
     }
 
-    //Refactored from Media Playback Lesson (Advance Android), initializes ExoPlayer
     private void initializePlayer(Uri mediaUri) {
         if (mExoPlayer == null) {
             // Create an instance of the ExoPlayer.
@@ -237,15 +236,6 @@ public class StepDetailsFragment extends Fragment {
             }
 
             mExoPlayer.setPlayWhenReady(true);
-        }
-    }
-
-    //method for cleaning up ExoPlayer
-    private void releasePlayer() {
-        if (mExoPlayer != null) {
-            mExoPlayer.stop();
-            mExoPlayer.release();
-            mExoPlayer = null;
         }
     }
 
@@ -273,7 +263,7 @@ public class StepDetailsFragment extends Fragment {
         }
     }
 
-    //method for setting up ExoPlayer
+    //method for setting up exoplayer
     private void setupExoPlayer() {
         //check to see if there is a videoUrl
         if (!mInstructions.get(requestedStep).getVideoUrl().equals("")) {
@@ -320,7 +310,6 @@ public class StepDetailsFragment extends Fragment {
         }
     }
 
-    //Refactored from Media Playback Lesson (Advance Android), shows Thumbnail on Exoplayer
     private void showThumbnail(String url) {
         //Setup ExoPlayer and ExoPlayerView
         if (mExoPlayer == null) {
@@ -343,7 +332,7 @@ public class StepDetailsFragment extends Fragment {
         mSimpleExoPlayerView.setDefaultArtwork(thumbnail);
     }
 
-    //Method for converting an MP4 to a Bitmap
+    //method for converting an mp4 to a bitmap
     //https://stackoverflow.com/questions/22954894/is-it-possible-to-generate-a-thumbnail-from-a-video-url-in-android
     private Bitmap convertMP4(String path) throws Throwable {
         Bitmap bitmap = null;
@@ -378,6 +367,15 @@ public class StepDetailsFragment extends Fragment {
     private void setupInstructions() {
         //set up instructions
         mStepTV.setText(mInstructions.get(requestedStep).getInstruction());
+    }
+
+    //method for cleaning up ExoPlayer
+    private void releasePlayer() {
+        if (mExoPlayer != null) {
+            mExoPlayer.stop();
+            mExoPlayer.release();
+            mExoPlayer = null;
+        }
     }
 
     @Override
