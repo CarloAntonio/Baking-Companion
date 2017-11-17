@@ -299,9 +299,15 @@ public class StepDetailsFragment extends Fragment {
 
             }
 
-        //if there is no thumbnail or video, hide exoplayer view
+        //if there is no thumbnail or video, show default image
         } else {
             mSimpleExoPlayerView.setVisibility(View.GONE);
+
+            if (mThumbnailIV != null) {
+                mThumbnailIV.setVisibility(View.VISIBLE);
+            }
+
+            Glide.with(getContext()).load(R.drawable.default_cooking).into(mThumbnailIV);
         }
     }
 
