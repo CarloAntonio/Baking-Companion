@@ -4,10 +4,22 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <com.google.android.exoplayer2.ui.SimpleExoPlayerView
-        android:id="@+id/exoplayer"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"/>
+        android:layout_height="300dp">
+
+        <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+            android:id="@+id/exoplayer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <ImageView
+            android:id="@+id/exoplayer_replacement_thumbnail"
+            android:contentDescription="Thumbnail of recipe step"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/step_instructions_frag_tv"
