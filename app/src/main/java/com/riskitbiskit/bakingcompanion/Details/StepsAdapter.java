@@ -11,6 +11,9 @@ import com.riskitbiskit.bakingcompanion.R;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHolder> {
 
     private LayoutInflater inflater;
@@ -30,18 +33,14 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
     @Override
     public StepsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View rootView = inflater.inflate(R.layout.recipe_step_item, parent, false);
-
         StepsViewHolder stepsViewHolder = new StepsViewHolder(rootView);
-
         return stepsViewHolder;
     }
 
     public void onBindViewHolder(StepsViewHolder holder, int position) {
         Instructions currentStep = instructions.get(position);
-
         String currentStepInstruction = currentStep.getShortDescription();
-
-        holder.instructionsTV.setText(currentStepInstruction);
+        holder.mInstructionsTV.setText(currentStepInstruction);
     }
 
     @Override
@@ -50,13 +49,14 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
     }
 
     class StepsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView instructionsTV;
+        @BindView(R.id.instruction_step)
+        TextView mInstructionsTV;
 
         public StepsViewHolder(View itemView) {
             super(itemView);
-
-            instructionsTV = itemView.findViewById(R.id.instruction_step);
-
+            //bind views
+            ButterKnife.bind(this, itemView);
+            //set click listener
             itemView.setOnClickListener(this);
         }
 

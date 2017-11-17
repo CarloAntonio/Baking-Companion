@@ -8,8 +8,6 @@ import com.riskitbiskit.bakingcompanion.R;
 
 public class StepDetails extends AppCompatActivity {
 
-    public static final String TEST = "test";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

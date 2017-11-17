@@ -1,9 +1,9 @@
 package com.riskitbiskit.bakingcompanion.Details;
 
 public class Ingredient {
-    double quantity;
-    String measurement;
-    String ingredient;
+    private double quantity;
+    private String measurement;
+    private String ingredient;
 
     public Ingredient(double quantity, String measurement, String ingredient) {
         this.quantity = quantity;

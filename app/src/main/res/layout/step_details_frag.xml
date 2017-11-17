@@ -6,19 +6,18 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="wrap_content">
 
         <com.google.android.exoplayer2.ui.SimpleExoPlayerView
             android:id="@+id/exoplayer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="wrap_content"/>
 
         <ImageView
             android:id="@+id/exoplayer_replacement_thumbnail"
-            android:contentDescription="Thumbnail of recipe step"
+            android:contentDescription="@string/thumbnail_of_recipe_step"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="230dp"/>
 
     </FrameLayout>
 
@@ -29,13 +28,13 @@
         android:layout_weight="1"
         android:layout_margin="16dp"
         android:textColor="@color/colorPrimaryDark"
+        android:textStyle="bold"
         android:gravity="center"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_margin="8dp"
         android:orientation="horizontal">
 
         <Button
@@ -54,6 +53,5 @@
             android:textColor="@color/colorAccent"
             android:text="@string/next_step"/>
     </LinearLayout>
-
 
 </LinearLayout>

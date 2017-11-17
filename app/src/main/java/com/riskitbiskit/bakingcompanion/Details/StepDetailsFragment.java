@@ -22,26 +22,21 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.riskitbiskit.bakingcompanion.Main.MainActivity;
 import com.riskitbiskit.bakingcompanion.R;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,99 +46,119 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class StepDetailsFragment extends Fragment implements ExoPlayer.EventListener{
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
-    public static final String TAG = "tag";
+public class StepDetailsFragment extends Fragment {
+
+    //Constants
+    public static final String VOLLEY_TAG = "volley_tag";
     public static final String LIST_INDEX = "index";
     public static final String INSTRUCTIONS_LIST = "instructions";
     public static final String PLAYER_POSITION = "playerPosition";
 
-    private SimpleExoPlayerView mExoPlayerView;
+    //Fields
     private SimpleExoPlayer mExoPlayer;
-    private Button previousButton;
-    private Button nextButton;
     private RequestQueue mRequestQueue;
     private int recipeNumber;
     private int requestedStep;
-    private TextView stepTextView;
     private boolean isTwoPanel;
-    private ImageView thumbnailIV;
     private long playerPosition;
-
     List<Instructions> mInstructions;
 
+    //Views
+    @BindView(R.id.exoplayer)
+    SimpleExoPlayerView mSimpleExoPlayerView;
+    @BindView(R.id.previous_button)
+    Button mPreviousBt;
+    @BindView(R.id.next_button)
+    Button mNextBt;
+    @BindView(R.id.step_instructions_frag_tv)
+    TextView mStepTV;
+    @BindView(R.id.exoplayer_replacement_thumbnail)
+    ImageView mThumbnailIV;
+
+    //constructor
     public StepDetailsFragment () {}
+
+    //setter methods
+    public void setRecipeNumber(int recipeNumber) {
+        this.recipeNumber = recipeNumber;
+    }
+
+    public void setRequestedStep(int requestedStep) {
+        this.requestedStep = requestedStep;
+    }
+
+    public void setIsTwoPanel(boolean isTwoPanel) {
+        this.isTwoPanel = isTwoPanel;
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+        //inflate layout
         View rootView = inflater.inflate(R.layout.step_details_frag, container, false);
 
-        mExoPlayerView = rootView.findViewById(R.id.exoplayer);
-        previousButton = rootView.findViewById(R.id.previous_button);
-        nextButton = rootView.findViewById(R.id.next_button);
-        stepTextView = rootView.findViewById(R.id.step_instructions_frag_tv);
-        thumbnailIV = rootView.findViewById(R.id.exoplayer_replacement_thumbnail);
+        //bind views
+        ButterKnife.bind(this, rootView);
 
+        //initialize variables
         mInstructions = new ArrayList<>();
 
+        //grab data from saved state and apply
         Intent intent = getActivity().getIntent();
 
-        if (savedInstanceState != null) {
-            requestedStep = savedInstanceState.getInt(LIST_INDEX);
-            mInstructions = savedInstanceState.getParcelableArrayList(INSTRUCTIONS_LIST);
-            playerPosition = savedInstanceState.getLong(PLAYER_POSITION);
-
-            setupInstructions();
-            setupExoPlayer();
-            addOrRemoveButtons();
-        } else if (isTwoPanel) {
-            makeVolleyRequest();
+        //check to see if device should display two panel or single panel
+        if (isTwoPanel) {
+            if (savedInstanceState != null) {
+                reuseSavedData(savedInstanceState);
+            } else {
+                makeVolleyRequest();
+            }
         } else {
-            //happening here
-            recipeNumber = intent.getIntExtra(MainActivity.RECIPE_INDEX_NUMBER, 0);
-            requestedStep = intent.getIntExtra(RecipeDetails.INSTRUCTION_STEP, 0);
-
-            makeVolleyRequest();
+            if (savedInstanceState != null) {
+                reuseSavedData(savedInstanceState);
+            } else {
+                recipeNumber = intent.getIntExtra(MainActivity.RECIPE_INDEX_NUMBER, 0);
+                requestedStep = intent.getIntExtra(RecipeDetails.INSTRUCTION_STEP, 0);
+                makeVolleyRequest();
+            }
         }
 
-        nextButton.setOnClickListener(new View.OnClickListener() {
+        mNextBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Clear ExoPlayer of current data
+                //clear exoplayer of current data
                 releasePlayer();
-
                 //increment to the next step
                 requestedStep++;
-
-                addOrRemoveButtons();
-
-                setupInstructions();
-
-                setupExoPlayer();
-
+                fullSetup();
             }
         });
 
-        previousButton.setOnClickListener(new View.OnClickListener() {
+        mPreviousBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Clear ExoPlayer of current data
+                //clear exoplayer of current data
                 releasePlayer();
-
                 //increment to the next step
                 requestedStep--;
-
-                addOrRemoveButtons();
-
-                setupInstructions();
-
-                setupExoPlayer();
+                fullSetup();
             }
         });
 
         return rootView;
+    }
+
+    private void reuseSavedData(Bundle savedInstanceState) {
+        //retrieved saved data
+        requestedStep = savedInstanceState.getInt(LIST_INDEX);
+        mInstructions = savedInstanceState.getParcelableArrayList(INSTRUCTIONS_LIST);
+        playerPosition = savedInstanceState.getLong(PLAYER_POSITION);
+
+        //setup views
+        fullSetup();
     }
 
     private void makeVolleyRequest() {
@@ -153,28 +168,8 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
             @Override
             public void onResponse(JSONArray response) {
                 try {
-                    JSONObject currentRecipe = response.getJSONObject(recipeNumber);
-
-                    //Grab requested instruction
-                    JSONArray requestedInstructions = currentRecipe.getJSONArray("steps");
-
-                    for (int i = 0; i < requestedInstructions.length(); i++) {
-                        JSONObject currentStep = requestedInstructions.getJSONObject(i);
-                        int id = currentStep.getInt("id");
-                        String shortDescription = currentStep.getString("shortDescription");
-                        String description = currentStep.getString("description");
-                        String videoUrl = currentStep.getString("videoURL");
-                        String thumbnail = currentStep.getString("thumbnailURL");
-
-                        mInstructions.add(new Instructions(id, shortDescription, description, videoUrl, thumbnail));
-                    }
-
-                    //set up instructions
-                    stepTextView.setText(mInstructions.get(requestedStep).getInstruction());
-
-                    setupExoPlayer();
-
-                    addOrRemoveButtons();
+                    parseJsonData(response);
+                    fullSetup();
 
                 } catch (JSONException JSONE) {
                     JSONE.printStackTrace();
@@ -187,22 +182,43 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
             }
         });
 
-        jsonArrayRequest.setTag(TAG);
+        jsonArrayRequest.setTag(VOLLEY_TAG);
 
         mRequestQueue.add(jsonArrayRequest);
     }
 
-    //Refactored from Media Playback Lesson (Advance Android), initializes ExoPlayer
+    private void parseJsonData(JSONArray response) throws JSONException {
+        //get reference to root node
+        JSONObject currentRecipe = response.getJSONObject(recipeNumber);
+
+        //grab requested instruction
+        JSONArray requestedInstructions = currentRecipe.getJSONArray("steps");
+
+        //cycle through each step
+        for (int i = 0; i < requestedInstructions.length(); i++) {
+            //extract relevant data from each step
+            JSONObject currentStep = requestedInstructions.getJSONObject(i);
+            int id = currentStep.getInt("id");
+            String shortDescription = currentStep.getString("shortDescription");
+            String description = currentStep.getString("description");
+            String videoUrl = currentStep.getString("videoURL");
+            String thumbnail = currentStep.getString("thumbnailURL");
+
+            //add to list of instructions
+            mInstructions.add(new Instructions(id, shortDescription, description, videoUrl, thumbnail));
+        }
+    }
+
     private void initializePlayer(Uri mediaUri) {
         if (mExoPlayer == null) {
             // Create an instance of the ExoPlayer.
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector, loadControl);
-            mExoPlayerView.setPlayer(mExoPlayer);
+            mSimpleExoPlayerView.setPlayer(mExoPlayer);
 
             // Set the ExoPlayer.EventListener to this activity.
-            mExoPlayer.addListener(this);
+            mExoPlayer.addListener(new ExoPlayerListener());
 
             // Prepare the MediaSource.
             String userAgent = Util.getUserAgent(getContext(), "StrangeBakerThings");
@@ -218,13 +234,10 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
         }
     }
 
-    //method for cleaning up ExoPlayer
-    private void releasePlayer() {
-        if (mExoPlayer != null) {
-            mExoPlayer.stop();
-            mExoPlayer.release();
-            mExoPlayer = null;
-        }
+    private void fullSetup() {
+        addOrRemoveButtons();
+        setupExoPlayer();
+        setupInstructions();
     }
 
     //method for setting up add or remove buttons depending on step
@@ -232,57 +245,71 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
 
         //Add or remove previous button
         if (requestedStep == 0) {
-            previousButton.setVisibility(View.GONE);
+            mPreviousBt.setVisibility(View.GONE);
         } else {
-            previousButton.setVisibility(View.VISIBLE);
+            mPreviousBt.setVisibility(View.VISIBLE);
         }
 
         //Add or remove next button
         if (mInstructions.size() -1 == requestedStep) {
-            nextButton.setVisibility(View.GONE);
+            mNextBt.setVisibility(View.GONE);
         } else {
-            nextButton.setVisibility(View.VISIBLE);
+            mNextBt.setVisibility(View.VISIBLE);
         }
     }
 
-    //method for setting up ExoPlayer
+    //method for setting up exoplayer
     private void setupExoPlayer() {
         //check to see if there is a videoUrl
         if (!mInstructions.get(requestedStep).getVideoUrl().equals("")) {
-            if (thumbnailIV != null) {
-                thumbnailIV.setVisibility(View.INVISIBLE);
+
+            //check to see that there is a reference to the image view
+            if (mThumbnailIV != null) {
+                //set to invisible, since there is a video available
+                mThumbnailIV.setVisibility(View.INVISIBLE);
             }
-            mExoPlayerView.setVisibility(View.VISIBLE);
+
+            //make exoplayer view visible so that it can play video
+            mSimpleExoPlayerView.setVisibility(View.VISIBLE);
+            //start playing video
             initializePlayer(Uri.parse(mInstructions.get(requestedStep).getVideoUrl()));
+
+        //check to see if there's a thumbnail instead
         } else if (!mInstructions.get(requestedStep).getThumbnailUrl().equals("")) {
+
+            //check to see if that thumbnail is actually a video
             if (mInstructions.get(requestedStep).getThumbnailUrl().contains(".mp4")) {
-                if (thumbnailIV != null) {
-                    thumbnailIV.setVisibility(View.INVISIBLE);
+                //if thumbnail is a video, we're going to convert it to an image so make imageview
+                //visible
+                if (mThumbnailIV != null) {
+                    mThumbnailIV.setVisibility(View.INVISIBLE);
                 }
-                mExoPlayerView.setVisibility(View.VISIBLE);
+                //make exoplay invisible
+                mSimpleExoPlayerView.setVisibility(View.VISIBLE);
+                //use showThumbnail method to show the thumbnail
                 showThumbnail(mInstructions.get(requestedStep).getThumbnailUrl());
+
             } else {
-                thumbnailIV.setVisibility(View.VISIBLE);
-                mExoPlayerView.setVisibility(View.INVISIBLE);
+                //make image view visible
+                mThumbnailIV.setVisibility(View.VISIBLE);
+                //make exoplayer view invisible
+                mSimpleExoPlayerView.setVisibility(View.INVISIBLE);
+                //set the thumbnail to
                 imageViewThumbnail(mInstructions.get(requestedStep).getThumbnailUrl());
             }
+
+        //if there is no thumbnail or video, show default image
         } else {
-            mExoPlayerView.setVisibility(View.GONE);
+            mSimpleExoPlayerView.setVisibility(View.GONE);
+
+            if (mThumbnailIV != null) {
+                mThumbnailIV.setVisibility(View.VISIBLE);
+            }
+
+            Glide.with(getContext()).load(R.drawable.default_cooking).into(mThumbnailIV);
         }
     }
 
-    //method for setting up instructions
-    private void setupInstructions() {
-        //set up instructions
-        stepTextView.setText(mInstructions.get(requestedStep).getInstruction());
-    }
-
-    //method for handling images
-    private void imageViewThumbnail(String thumbnailUrl) {
-        Picasso.with(getContext()).load(thumbnailUrl).into(thumbnailIV);
-    }
-
-    //Refactored from Media Playback Lesson (Advance Android), shows Thumbnail on Exoplayer
     private void showThumbnail(String url) {
         //Setup ExoPlayer and ExoPlayerView
         if (mExoPlayer == null) {
@@ -290,7 +317,7 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector, loadControl);
-            mExoPlayerView.setPlayer(mExoPlayer);
+            mSimpleExoPlayerView.setPlayer(mExoPlayer);
         }
 
         //Create a bitmap from an MP4
@@ -302,10 +329,10 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
         }
 
         //Attach bitmap to ExoPlayerView
-        mExoPlayerView.setDefaultArtwork(thumbnail);
+        mSimpleExoPlayerView.setDefaultArtwork(thumbnail);
     }
 
-    //Method for converting an MP4 to a Bitmap
+    //method for converting an mp4 to a bitmap
     //https://stackoverflow.com/questions/22954894/is-it-possible-to-generate-a-thumbnail-from-a-video-url-in-android
     private Bitmap convertMP4(String path) throws Throwable {
         Bitmap bitmap = null;
@@ -331,53 +358,29 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
         return bitmap;
     }
 
-    //Setter Methods
-    public void setRecipeNumber(int recipeNumber) {
-        this.recipeNumber = recipeNumber;
+    //method for handling images
+    private void imageViewThumbnail(String thumbnailUrl) {
+        Glide.with(getContext()).load(thumbnailUrl).into(mThumbnailIV);
     }
 
-    public void setRequestedStep(int requestedStep) {
-        this.requestedStep = requestedStep;
+    //method for setting up instructions
+    private void setupInstructions() {
+        //set up instructions
+        mStepTV.setText(mInstructions.get(requestedStep).getInstruction());
     }
 
-    public void setIsTwoPanel(boolean isTwoPanel) {
-        this.isTwoPanel = isTwoPanel;
-    }
-
-    @Override
-    public void onTimelineChanged(Timeline timeline, Object manifest) {
-
-    }
-
-    @Override
-    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-
-    }
-
-    @Override
-    public void onLoadingChanged(boolean isLoading) {
-
-    }
-
-    @Override
-    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-
-    }
-
-    @Override
-    public void onPlayerError(ExoPlaybackException error) {
-
-    }
-
-    @Override
-    public void onPositionDiscontinuity() {
-
+    //method for cleaning up ExoPlayer
+    private void releasePlayer() {
+        if (mExoPlayer != null) {
+            mExoPlayer.stop();
+            mExoPlayer.release();
+            mExoPlayer = null;
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
         if(mInstructions.size() != 0) {
             initializePlayer(Uri.parse(mInstructions.get(requestedStep).getVideoUrl()));
         }
@@ -389,24 +392,24 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
         outState.putParcelableArrayList(INSTRUCTIONS_LIST, (ArrayList<Instructions>) mInstructions);
         outState.putInt(LIST_INDEX, requestedStep);
 
-        playerPosition = mExoPlayer.getCurrentPosition();
-        outState.putLong(PLAYER_POSITION, playerPosition);
+        if (mExoPlayer != null) {
+            playerPosition = mExoPlayer.getCurrentPosition();
+            outState.putLong(PLAYER_POSITION, playerPosition);
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
         if (mRequestQueue != null) {
-            mRequestQueue.cancelAll(TAG);
+            mRequestQueue.cancelAll(VOLLEY_TAG);
         }
-
         releasePlayer();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-
         //clean up playerPosition
         playerPosition = 0L;
     }

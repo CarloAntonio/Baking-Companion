@@ -8,13 +8,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.riskitbiskit.bakingcompanion.R;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class RecipeRVAdapter extends RecyclerView.Adapter<RecipeRVAdapter.RecipeViewHolder> {
 
+    //Fields
     private LayoutInflater mLayoutInflater;
     private List<Recipe> mRecipes;
     private Context mContext;
@@ -40,26 +44,60 @@ public class RecipeRVAdapter extends RecyclerView.Adapter<RecipeRVAdapter.Recipe
         return recipeViewHolder;
     }
 
+    //TODO: feat - add a picture of a picture isnt present
     @Override
     public void onBindViewHolder(RecipeViewHolder holder, int position) {
         Recipe currentRecipe = mRecipes.get(position);
 
         if (!currentRecipe.getImage().equals("")) {
-            if (holder.recipeImage != null) {
-                holder.recipeImage.setVisibility(View.VISIBLE);
+            if (holder.mRecipeIV != null) {
+                holder.mRecipeIV.setVisibility(View.VISIBLE);
             }
-            if (holder.recipeNameTV != null) {
-                holder.recipeNameTV.setVisibility(View.INVISIBLE);
+            if (holder.mRecipeNameCoverTV != null) {
+                holder.mRecipeNameCoverTV.setVisibility(View.VISIBLE);
             }
-            Picasso.with(mContext).load(currentRecipe.getImage()).into(holder.recipeImage);
+            if (holder.mRecipeNameTV != null) {
+                holder.mRecipeNameTV.setVisibility(View.INVISIBLE);
+            }
+            Glide.with(mContext).load(currentRecipe.getImage()).into(holder.mRecipeIV);
         } else {
-            if (holder.recipeImage != null) {
-                holder.recipeImage.setVisibility(View.INVISIBLE);
+            //use image in data drawable instead
+            if (holder.mRecipeIV != null) {
+                holder.mRecipeIV.setVisibility(View.VISIBLE);
             }
-            if (holder.recipeNameTV != null) {
-                holder.recipeNameTV.setVisibility(View.VISIBLE);
+            if (holder.mRecipeNameCoverTV != null) {
+                holder.mRecipeNameCoverTV.setVisibility(View.VISIBLE);
             }
-            holder.recipeNameTV.setText(currentRecipe.getName());
+            if (holder.mRecipeNameTV != null) {
+                holder.mRecipeNameTV.setVisibility(View.INVISIBLE);
+            }
+
+            //get recipe name
+            String recipeName = currentRecipe.getName();
+
+            //find correct drawable image
+            if (recipeName.contentEquals("Nutella Pie")) {
+                Glide.with(mContext).load(R.drawable.pie).into(holder.mRecipeIV);
+                holder.mRecipeNameCoverTV.setText(currentRecipe.getName());
+            } else if (recipeName.contentEquals("Brownies")) {
+                Glide.with(mContext).load(R.drawable.brownies).into(holder.mRecipeIV);
+                holder.mRecipeNameCoverTV.setText(currentRecipe.getName());
+            } else if (recipeName.contentEquals("Yellow Cake")) {
+                Glide.with(mContext).load(R.drawable.cake).into(holder.mRecipeIV);
+                holder.mRecipeNameCoverTV.setText(currentRecipe.getName());
+            } else if (recipeName.contentEquals("Cheesecake")) {
+                Glide.with(mContext).load(R.drawable.cheesecake).into(holder.mRecipeIV);
+                holder.mRecipeNameCoverTV.setText(currentRecipe.getName());
+            } else {
+                //Original code, specified by guideline, but UI looks unappealing
+                if (holder.mRecipeIV != null) {
+                    holder.mRecipeIV.setVisibility(View.INVISIBLE);
+                }
+                if (holder.mRecipeNameTV != null) {
+                    holder.mRecipeNameTV.setVisibility(View.VISIBLE);
+                }
+                holder.mRecipeNameTV.setText(currentRecipe.getName());
+            }
         }
 
     }
@@ -70,14 +108,17 @@ public class RecipeRVAdapter extends RecyclerView.Adapter<RecipeRVAdapter.Recipe
     }
 
     public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        ImageView recipeImage;
-        TextView recipeNameTV;
+        //Views
+        @BindView(R.id.recipe_image_IV)
+        ImageView mRecipeIV;
+        @BindView(R.id.recipe_name_TV)
+        TextView mRecipeNameTV;
+        @BindView(R.id.recipe_name_cover)
+        TextView mRecipeNameCoverTV;
 
         public RecipeViewHolder(View itemView) {
             super(itemView);
-
-            recipeImage = itemView.findViewById(R.id.recipe_image);
-            recipeNameTV = itemView.findViewById(R.id.recipe_name);
+            ButterKnife.bind(this, itemView);
 
             itemView.setOnClickListener(this);
         }
