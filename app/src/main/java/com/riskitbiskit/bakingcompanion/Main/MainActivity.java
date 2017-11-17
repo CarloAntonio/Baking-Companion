@@ -75,6 +75,11 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        //setup action bar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
+        //initialize variables
         recipes = new ArrayList<>();
         recipeNames = new ArrayList<>();
         mActivityTitle = getTitle().toString();
@@ -93,27 +98,18 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
                 //TODO: remove - data only gets set once, no need to notify adapter
                 rvAdpter.notifyDataSetChanged();
 
-                //Sets up hamburger menu
+                //setup hamburger menu
                 //Refactored code from: https://developer.android.com/training/implementing-navigation/nav-drawer.html
                 //and http://blog.teamtreehouse.com/add-navigation-drawer-android
-                setupMenuItems();
                 setupMenu();
 
-                mDrawerToggle.setDrawerIndicatorEnabled(true);
-
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                getSupportActionBar().setHomeButtonEnabled(true);
-
-                mDrawerToggle.syncState();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(LOG_TAG, error + "");
-                Toast.makeText(getBaseContext(), "Error Fetching Data", Toast.LENGTH_SHORT).show();
+                Log.e(LOG_TAG, "Error Fetching Data: " + error);
             }
-        }
-        );
+        });
 
         mRequestQueue.add(jsonArrayRequest);
 
@@ -153,9 +149,11 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
         }
     }
 
-    private void setupMenuItems() {
+    private void setupMenu() {
+
         //Setup Hamburger Menu
         arrayAdapter = new ArrayAdapter<>(getBaseContext(), android.R.layout.simple_list_item_1, recipeNames);
+
         mDrawerList.setAdapter(arrayAdapter);
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -166,9 +164,7 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
                 startActivity(intent);
             }
         });
-    }
 
-    private void setupMenu() {
         //Setup Hamburger Image
         mDrawerToggle = new ActionBarDrawerToggle(MainActivity.this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
             @Override
@@ -184,6 +180,10 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
                 getSupportActionBar().setTitle(mActivityTitle);
             }
         };
+
+        mDrawerToggle.setDrawerIndicatorEnabled(true);
+
+        mDrawerToggle.syncState();
     }
 
     @Override
