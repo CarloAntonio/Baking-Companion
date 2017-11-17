@@ -24,7 +24,7 @@
                 android:id="@+id/exoplayer_replacement_thumbnail"
                 android:contentDescription="@string/thumbnail_of_recipe_step"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="250dp"/>
 
         </FrameLayout>
 
