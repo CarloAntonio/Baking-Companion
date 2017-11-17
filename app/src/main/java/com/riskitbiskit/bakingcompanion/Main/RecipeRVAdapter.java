@@ -44,6 +44,7 @@ public class RecipeRVAdapter extends RecyclerView.Adapter<RecipeRVAdapter.Recipe
         return recipeViewHolder;
     }
 
+    //TODO: feat - add a picture of a picture isnt present
     @Override
     public void onBindViewHolder(RecipeViewHolder holder, int position) {
         Recipe currentRecipe = mRecipes.get(position);
