@@ -11,18 +11,16 @@ import com.riskitbiskit.bakingcompanion.Details.RecipeDetails;
 import com.riskitbiskit.bakingcompanion.R;
 
 public class RecipeWidgetProvider extends AppWidgetProvider {
-    public static final String LOG_TAG = RecipeWidgetProvider.class.getSimpleName();
-
+    //Constants
     public static final String RECIPE_TAG = "recipeTag";
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int requestedRecipe, int totalRecipes, int appWidgetId) {
 
-
-        // Construct the RemoteViews object
+        // construct remote views object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.recipe_widget_provider);
 
-        //Setup button intent
+        //setup button intent
         Intent buttonIntent = new Intent(context, UpdateWidgetService.class);
         buttonIntent.putExtra(RECIPE_TAG, requestedRecipe);
         buttonIntent.setAction(UpdateWidgetService.ACTION_UPDATE_WIDGET);

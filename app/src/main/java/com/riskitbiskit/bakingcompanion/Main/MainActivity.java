@@ -182,7 +182,11 @@ public class MainActivity extends AppCompatActivity implements RecipeRVAdapter.L
                 gridLayoutManager = new GridLayoutManager(this, 2);
             }
         } else {
-            gridLayoutManager = new GridLayoutManager(this, 3);
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                gridLayoutManager = new GridLayoutManager(this, 2);
+            } else {
+                gridLayoutManager = new GridLayoutManager(this, 3);
+            }
         }
 
         recipeListRV.setLayoutManager(gridLayoutManager);

@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.riskitbiskit.bakingcompanion.R;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -56,15 +56,38 @@ public class RecipeRVAdapter extends RecyclerView.Adapter<RecipeRVAdapter.Recipe
             if (holder.mRecipeNameTV != null) {
                 holder.mRecipeNameTV.setVisibility(View.INVISIBLE);
             }
-            Picasso.with(mContext).load(currentRecipe.getImage()).into(holder.mRecipeIV);
+            Glide.with(mContext).load(currentRecipe.getImage()).into(holder.mRecipeIV);
         } else {
+            //use image in data drawable instead
             if (holder.mRecipeIV != null) {
-                holder.mRecipeIV.setVisibility(View.INVISIBLE);
+                holder.mRecipeIV.setVisibility(View.VISIBLE);
             }
             if (holder.mRecipeNameTV != null) {
-                holder.mRecipeNameTV.setVisibility(View.VISIBLE);
+                holder.mRecipeNameTV.setVisibility(View.INVISIBLE);
             }
-            holder.mRecipeNameTV.setText(currentRecipe.getName());
+
+            //get recipe name
+            String recipeName = currentRecipe.getName();
+
+            //find correct drawable image
+            if (recipeName.contentEquals("Nutella Pie")) {
+                Glide.with(mContext).load(R.drawable.pie).into(holder.mRecipeIV);
+            } else if (recipeName.contentEquals("Brownies")) {
+                Glide.with(mContext).load(R.drawable.brownies).into(holder.mRecipeIV);
+            } else if (recipeName.contentEquals("Yellow Cake")) {
+                Glide.with(mContext).load(R.drawable.cake).into(holder.mRecipeIV);
+            } else if (recipeName.contentEquals("Cheesecake")) {
+                Glide.with(mContext).load(R.drawable.cheesecake).into(holder.mRecipeIV);
+            } else {
+                //Original code, specified by guideline, but UI looks unappealing
+                if (holder.mRecipeIV != null) {
+                    holder.mRecipeIV.setVisibility(View.INVISIBLE);
+                }
+                if (holder.mRecipeNameTV != null) {
+                    holder.mRecipeNameTV.setVisibility(View.VISIBLE);
+                }
+                holder.mRecipeNameTV.setText(currentRecipe.getName());
+            }
         }
 
     }
