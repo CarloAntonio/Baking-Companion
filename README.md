@@ -12,22 +12,25 @@ This app can:
 
 ### User Facing Screens
 Main Screen (Phone) </br>
-<img src="https://user-images.githubusercontent.com/25759516/31746588-0bcc2070-b41d-11e7-9890-6587df5da5df.png" width="400">
+<img src="https://user-images.githubusercontent.com/25759516/32975430-e8a90a84-cbbb-11e7-97ef-8a4e1b465685.png" width="300">
 
-Main Screen Menu (Phone) </br>
-<img src="https://user-images.githubusercontent.com/25759516/31746590-0d5d13ea-b41d-11e7-9ef2-5c3e0478a7b2.png" width="400">
+Recipe Overview Screen (Phone) </br>
+<img src="https://user-images.githubusercontent.com/25759516/32975438-effe20d0-cbbb-11e7-867b-3c12738fbdec.png" width="300">
 
-Ingredient & Directions (Phone) </br>
-<img src="https://user-images.githubusercontent.com/25759516/31746591-0ef9fb96-b41d-11e7-9d4c-2dedc2c7bc22.png" width="400">
+Step Details Screen (Phone) </br>
+<img src="https://user-images.githubusercontent.com/25759516/32975441-f27d3224-cbbb-11e7-9bbf-b13ba9ee593c.png" width="300">
 
-Ingredient Details (Phone) </br>
-<img src="https://user-images.githubusercontent.com/25759516/31746594-10a8d21e-b41d-11e7-98fc-fb9e5cd32ed4.png" width="400">
+Step Details Screen (Phone - Landscape) </br>
+<img src="https://user-images.githubusercontent.com/25759516/32975444-f5b8fb6c-cbbb-11e7-9c10-f2988c6c116a.png" width="450">
 
-Main Screen (Tablet) </br>
-<img src="https://user-images.githubusercontent.com/25759516/31746601-15a4e62c-b41d-11e7-8c50-bbb9051da8ff.png" width="800">
+Main Screen (Tablet - Lanscape) </br>
+<img src="https://user-images.githubusercontent.com/25759516/32975445-f829afcc-cbbb-11e7-8811-e3b0d762a5a2.png" width="700">
+
+Two Panel (Tablet - Landscape) </br>
+<img src="https://user-images.githubusercontent.com/25759516/32975447-faaa4f7c-cbbb-11e7-94f5-f19333d5bdf3.png" width="700">
 
 Two Panel (Tablet) </br>
-<img src="https://user-images.githubusercontent.com/25759516/31746604-17f57bb2-b41d-11e7-825b-9750bdf6e14f.png" width="800">
+<img src="https://user-images.githubusercontent.com/25759516/32975448-fc6806e2-cbbb-11e7-9391-cfe80688152e.png" width="500">
 
 ### Libraries Used
 * Butterknife
